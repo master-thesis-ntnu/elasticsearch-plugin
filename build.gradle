@@ -1,14 +1,46 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.elasticsearch.gradle:build-tools:5.2.2"
+    }
+}
+
+if (GradleVersion.current() != GradleVersion.version('2.13')) {
+    throw new GradleException('Gradle 2.13 is required to build elasticsearch')
+}
+
 group 'query-expansion-plugin'
 version '0.1'
 
 apply plugin: 'java'
+apply plugin: 'elasticsearch.esplugin'
+apply plugin: 'idea'
 
-sourceCompatibility = 1.5
-
-repositories {
-    mavenCentral()
+esplugin {
+    name 'query-expansion-plugin'
+    description 'Query expansion plugin for Elasticsearch'
+    classname 'org.elasticsearch.plugin.QueryExpansionPlugin'
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile 'org.elasticsearch:elasticsearch:5.2.2'
+
+    testCompile 'org.elasticsearch.test:framework:5.2.2'
 }
+
+checkstyleMain.enabled = true
+checkstyleTest.enabled = true
+
+// FIXME dependency license check needs to be enabled
+dependencyLicenses.enabled = false
+
+// FIXME thirdparty audit needs to be enabled
+thirdPartyAudit.enabled = false
+
+// Uncomment this to skip license header checks
+// licenseHeaders.enabled = false
