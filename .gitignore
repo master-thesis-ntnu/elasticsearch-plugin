@@ -3,3 +3,8 @@
 
 # Gradle generated folder
 .gradle/
+
+# Maven files
+target/
+classes/
+build/
