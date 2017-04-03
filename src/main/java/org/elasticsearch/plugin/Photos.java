@@ -5,10 +5,15 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 
 import java.io.IOException;
 
-public class Photos implements ToXContent{
+public class Photos implements ToXContent {
+    private String result;
+
+    public Photos(String result) {
+        this.result = result;
+    }
 
     @Override
     public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
-        return builder.field("message", "Hello World!");
+        return builder.field("message", result);
     }
 }
