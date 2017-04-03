@@ -25,7 +25,7 @@ public class QueryExpansionRestHandler extends BaseRestHandler {
         SearchResponse searchResponse = client.prepareSearch("test")
                 .setQuery(QueryBuilders.termsQuery("tags", "test"))
                 .get();
-        searchResponse.
+        
         String result = searchResponse.toString();
         return channel -> {
             Photos photos = new Photos(result);
