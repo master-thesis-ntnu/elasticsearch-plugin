@@ -6,6 +6,7 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import java.io.IOException;
 
 public class Photos implements ToXContent {
+    private static final String RESULT_KEY = "result";
     private String result;
 
     public Photos(String result) {
@@ -14,6 +15,6 @@ public class Photos implements ToXContent {
 
     @Override
     public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
-        return builder.field("message", result);
+        return builder.field(RESULT_KEY, result);
     }
 }
