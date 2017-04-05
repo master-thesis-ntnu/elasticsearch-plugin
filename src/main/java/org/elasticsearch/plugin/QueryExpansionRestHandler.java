@@ -29,6 +29,8 @@ public class QueryExpansionRestHandler extends BaseRestHandler {
         SearchResponse searchResponse = client.prepareSearch(INDEX_NAME)
                 .setQuery(QueryBuilders.termsQuery("tags", "test"))
                 .get();
+
+        // QueryExpansionCalculation calculation = new QueryExpansionCalculation();
         String searchString = retrieveSearchStringFromRequest(request.content());
 
         String result = searchString;
