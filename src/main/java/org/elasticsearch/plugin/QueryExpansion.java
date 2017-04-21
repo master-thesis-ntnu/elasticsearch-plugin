@@ -1,5 +1,6 @@
 package org.elasticsearch.plugin;
 
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
@@ -8,29 +9,32 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class QueryExpansionCalculation {
+public class QueryExpansion {
     private HashMap<String, TermData> terms;
-    private SearchHit[] searchHits;
-    private String originalQuery;
-    private boolean hasCalculatedKlScores;
-
     private int totalNumberOfTermsInTopKDocuments;
-    private int totalNumberOfTermsInCollection;
-
     private Searcher searcher;
+    private SearchHit[] searchHits;
+    private QueryUtil queryUtil;
 
-    public QueryExpansionCalculation(SearchHit[] searchHits, String originalQuery, NodeClient client) {
-        this.searchHits = searchHits;
-        this.originalQuery = originalQuery;
-
+    public QueryExpansion(NodeClient client) {
         searcher = new Searcher(client);
-        terms = new HashMap<String, TermData>();
+        terms = new HashMap<>();
     }
 
-    public void calculateKlScores() {
-        totalNumberOfTermsInCollection = (int) searcher.getNumberOfTermsInCollection();
-        generateTermDataFromPhotosArray();
+    public SearchResponse getQueryExpandedSearch(String originalQuery) {
+        queryUtil = new QueryUtil(originalQuery);
+        searchHits = searcher.termSearch(queryUtil.getQueryTermsFromQueryString());
 
+        generateTermDataFromPhotosArray();
+        calculateKlScores();
+
+        String[] queryExpandedSearchTerms = queryUtil.getExpandedSearchTerms();
+
+        return searcher.termSearchWithSearchResponse(queryExpandedSearchTerms);
+    }
+
+    private void calculateKlScores() {
+        int totalNumberOfTermsInCollection = (int) searcher.getNumberOfTermsInCollection();
         TermData[] calculatedKlScores = new TermData[searchHits.length];
 
         int index = 0;
@@ -42,8 +46,7 @@ public class QueryExpansionCalculation {
         }
 
         Arrays.sort(calculatedKlScores);
-
-        //  TODO: Return expanded query terms
+        queryUtil.setScoredTerms(calculatedKlScores);
     }
 
     private void generateTermDataFromPhotosArray() {
@@ -57,7 +60,8 @@ public class QueryExpansionCalculation {
                 if (terms.containsKey(term)) {
                     terms.get(term).incrementNumberOfTimesInTopKDocuments();
                 } else {
-                    int numberOfTimesInCollection = 10; // TODO: Fetch dynamically
+                    int numberOfTimesInCollection = (int) searcher.getNumberOfTimesInCollection(term);
+
                     TermData termData = new TermData(term);
                     termData.setNumberOfTimesInCollection(numberOfTimesInCollection);
 
@@ -67,13 +71,5 @@ public class QueryExpansionCalculation {
 
             totalNumberOfTermsInTopKDocuments += tags.size();
         }
-    }
-
-    public String getQueryExpandedSearchTerms() {
-        if (!hasCalculatedKlScores) {
-            throw new RuntimeException("Kullback Leibler scores has to be calculated before expanded terms can be calculated");
-        }
-
-        return null;
     }
 }

@@ -30,15 +30,17 @@ public class QueryExpansionRestHandler extends BaseRestHandler {
                 .setQuery(QueryBuilders.termsQuery("tags", "test"))
                 .get();
 
-        // QueryExpansionCalculation calculation = new QueryExpansionCalculation();
-        String searchString = retrieveSearchStringFromRequest(request.content());
+        String searchQuery = retrieveSearchStringFromRequest(request.content());
+        QueryExpansion queryExpansion = new QueryExpansion(client);
+        SearchResponse queryExpandedSearchResult = queryExpansion.getQueryExpandedSearch(searchQuery);
 
-        String result = searchString;
+        // String result = searchQuery;
         return channel -> {
-            Photos photos = new Photos(result);
+            // Photos photos = new Photos(result);
             XContentBuilder builder = channel.newBuilder();
             builder.startObject();
-            photos.toXContent(builder, request);
+            // photos.toXContent(builder, request);
+            queryExpandedSearchResult.toXContent(builder, request);
             builder.endObject();
             channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
         };

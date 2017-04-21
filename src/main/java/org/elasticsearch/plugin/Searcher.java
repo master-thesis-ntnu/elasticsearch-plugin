@@ -4,7 +4,7 @@ import org.elasticsearch.action.fieldstats.FieldStatsResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.SearchHit;
 
 public class Searcher {
     private NodeClient client;
@@ -15,12 +15,20 @@ public class Searcher {
         this.client = client;
     }
 
-    public SearchHits termSearch(String termQuery) {
-        SearchResponse searchResponse = client.prepareSearch(INDEX_NAME)
-                .setQuery(QueryBuilders.termsQuery("tags", termQuery))
+    public SearchHit[] termSearch(String[] termsQuery) {
+        SearchResponse searchResponse = client
+                .prepareSearch(INDEX_NAME)
+                .setQuery(QueryBuilders.termsQuery("tags", termsQuery))
                 .get();
 
-        return searchResponse.getHits();
+        return searchResponse.getHits().getHits();
+    }
+
+    public SearchResponse termSearchWithSearchResponse(String[] termsQuery) {
+        return client
+                .prepareSearch(INDEX_NAME)
+                .setQuery(QueryBuilders.termsQuery("tags", termsQuery))
+                .get();
     }
 
     public long getNumberOfTimesInCollection(String term) {
