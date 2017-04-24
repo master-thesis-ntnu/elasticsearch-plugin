@@ -3,11 +3,11 @@ package org.elasticsearch.plugin;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHitField;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class QueryExpansion {
     private HashMap<String, TermData> terms;
@@ -51,9 +51,9 @@ public class QueryExpansion {
 
     private void generateTermDataFromPhotosArray() {
         for (SearchHit searchHit : searchHits) {
-            SearchHitField searchHitField = searchHit.field(FieldNames.TAGS_FIELD_NAME);
+            Map<String, Object> photoMap = searchHit.getSource();
 
-            List tags = searchHitField.getValues();
+            List tags = (List) photoMap.get(FieldNames.TAGS_FIELD_NAME);
             for (Object tag : tags) {
                 String term = (String) tag;
 

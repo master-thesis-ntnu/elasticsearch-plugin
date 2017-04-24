@@ -1,6 +1,6 @@
 package org.elasticsearch.plugin;
 
-public class TermData {
+public class TermData implements Comparable<TermData> {
     private String term;
     private int numberOfTimesInTopKDocuments = 1;
     private int numberOfTimesInCollection;
