@@ -35,7 +35,7 @@ public class QueryExpansion {
 
     private void calculateKlScores() {
         int totalNumberOfTermsInCollection = (int) searcher.getNumberOfTermsInCollection();
-        TermData[] calculatedKlScores = new TermData[searchHits.length];
+        TermData[] calculatedKlScores = new TermData[terms.size()];
 
         int index = 0;
         for (TermData termData : terms.values()) {

@@ -29,19 +29,26 @@ public class QueryUtil {
         }
 
         int sizeOfNewQueryTerms = getSizeOfNewQueryTerms();
-        String[] expandedQueryTerms1 = new String[sizeOfNewQueryTerms];
+        String[] expandedQueryTerms = new String[sizeOfNewQueryTerms];
 
         int newQueryTermsIndex = 0;
 
         for (int i = 0; i < sizeOfNewQueryTerms; i++) {
             if (i < originalQueryTerms.length) {
-                expandedQueryTerms1[i] = originalQueryTerms[i];
+                if (originalQueryTerms[i] == null) {
+                    continue;
+                }
+                expandedQueryTerms[i] = originalQueryTerms[i];
             } else {
+
                 for (int j = newQueryTermsIndex; j < scoredTerms.length; j++) {
                     String term = scoredTerms[j].getTerm();
+                    if (term == null) {
+                        break;
+                    }
 
                     if (!termExistsInOriginalQuery(term)) {
-                        expandedQueryTerms1[i] = term;
+                        expandedQueryTerms[i] = term;
                         newQueryTermsIndex++;
 
                         break;
@@ -52,7 +59,7 @@ public class QueryUtil {
             }
         }
 
-        return expandedQueryTerms1;
+        return expandedQueryTerms;
     }
 
     private boolean termExistsInOriginalQuery(String term) {

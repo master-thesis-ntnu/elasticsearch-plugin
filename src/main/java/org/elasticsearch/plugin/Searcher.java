@@ -6,6 +6,8 @@ import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 
+import java.util.Arrays;
+
 public class Searcher {
     private NodeClient client;
 
@@ -25,9 +27,10 @@ public class Searcher {
     }
 
     public SearchResponse termSearchWithSearchResponse(String[] termsQuery) {
+        String[] test = Arrays.copyOfRange(termsQuery, 0, termsQuery.length - 2);
         return client
                 .prepareSearch(INDEX_NAME)
-                .setQuery(QueryBuilders.termsQuery("tags", termsQuery))
+                .setQuery(QueryBuilders.termsQuery("tags", test))
                 .get();
     }
 
