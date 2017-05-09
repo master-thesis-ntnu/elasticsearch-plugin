@@ -31,12 +31,14 @@ public class Searcher {
         return client
                 .prepareSearch(INDEX_NAME)
                 .setQuery(QueryBuilders.termsQuery("tags", test))
+                // TODO: maybe use this? .setSize(0)
                 .get();
     }
 
     public long getNumberOfTimesInCollection(String term) {
         SearchResponse searchResponse = client.prepareSearch(INDEX_NAME)
                 .setQuery(QueryBuilders.termQuery("tags", term))
+                // TODO: maybe use this? .setSize(0)
                 .get();
 
         return searchResponse.getHits().getTotalHits();
