@@ -27,10 +27,10 @@ public class Searcher {
     }
 
     public SearchResponse termSearchWithSearchResponse(String[] termsQuery) {
-        String[] test = Arrays.copyOfRange(termsQuery, 0, termsQuery.length - 2);
+        String[] terms = Arrays.copyOfRange(termsQuery, 0, termsQuery.length);
         return client
                 .prepareSearch(INDEX_NAME)
-                .setQuery(QueryBuilders.termsQuery("tags", test))
+                .setQuery(QueryBuilders.termsQuery("tags", terms))
                 // TODO: maybe use this? .setSize(0)
                 .get();
     }

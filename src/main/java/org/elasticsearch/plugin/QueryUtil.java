@@ -5,7 +5,7 @@ public class QueryUtil {
     private TermData[] scoredTerms;
 
     private static final String SPLIT_CHARACTER = " ";
-    private static final int MAX_NUMBER_OF_SEARCH_TERMS = 5;
+    private static final int MAX_NUMBER_OF_SEARCH_TERMS = 10;
 
     public QueryUtil(String queryString) {
         originalQueryTerms = queryString.split(SPLIT_CHARACTER);
@@ -43,9 +43,6 @@ public class QueryUtil {
 
                 for (int j = newQueryTermsIndex; j < scoredTerms.length; j++) {
                     String term = scoredTerms[j].getTerm();
-                    if (term == null) {
-                        break;
-                    }
 
                     if (!termExistsInOriginalQuery(term)) {
                         expandedQueryTerms[i] = term;
@@ -67,9 +64,9 @@ public class QueryUtil {
     }
 
     private int getSizeOfNewQueryTerms() {
-        int combinedTermSize = originalQueryTerms.length + scoredTerms.length;
+        int newTermsSize = scoredTerms.length;
 
-        return combinedTermSize > MAX_NUMBER_OF_SEARCH_TERMS? MAX_NUMBER_OF_SEARCH_TERMS : combinedTermSize;
+        return newTermsSize > MAX_NUMBER_OF_SEARCH_TERMS? MAX_NUMBER_OF_SEARCH_TERMS : newTermsSize;
     }
 
     private String[] splitStringOnCharacter(String string, String splitCharacter) {
