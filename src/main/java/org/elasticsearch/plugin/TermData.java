@@ -31,12 +31,18 @@ public class TermData implements Comparable<TermData> {
     }
 
     public void calculateKlScore(int totalNumberOfTermsInTopKDocuments, int totalNumberOfTermsInCollection) {
+        // System.out.println("Term: " + term);
+        // System.out.println("Number of times in top k: " + getNumberOfTimesInTopKDocuments());
+        // System.out.println("Number of terms in top k: " + totalNumberOfTermsInTopKDocuments);
+        // System.out.println("Number of times in collection: " + getNumberOfTimesInCollection());
+        // System.out.println("Number of terms in collection: " + totalNumberOfTermsInCollection);
         klScore = KullbackLeibler.calculateKullbackLeiblerDistance(
                 numberOfTimesInTopKDocuments,
                 totalNumberOfTermsInTopKDocuments,
                 numberOfTimesInCollection,
                 totalNumberOfTermsInCollection
         );
+        // System.out.println("Score: " + klScore);
     }
 
     public double getKlScore() {
