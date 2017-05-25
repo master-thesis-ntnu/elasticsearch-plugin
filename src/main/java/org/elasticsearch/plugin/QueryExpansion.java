@@ -12,25 +12,27 @@ import java.util.Map;
 public class QueryExpansion {
     private HashMap<String, TermData> terms;
     private int totalNumberOfTermsInTopKDocuments;
+    private int searchResultSize;
     private Searcher searcher;
     private SearchHit[] searchHits;
     private QueryUtil queryUtil;
 
-    public QueryExpansion(NodeClient client) {
+    public QueryExpansion(NodeClient client, int searchResultSize) {
         searcher = new Searcher(client);
         terms = new HashMap<>();
+        this.searchResultSize = searchResultSize;
     }
 
     public SearchResponse getQueryExpandedSearch(String originalQuery) {
         queryUtil = new QueryUtil(originalQuery);
-        searchHits = searcher.termSearch(queryUtil.getQueryTermsFromQueryString());
+        searchHits = searcher.termSearch(queryUtil.getQueryTermsFromQueryString(), searchResultSize);
 
         generateTermDataFromPhotosArray();
         calculateKlScores();
 
         String[] queryExpandedSearchTerms = queryUtil.getExpandedSearchTerms();
 
-        return searcher.termSearchWithSearchResponse(queryExpandedSearchTerms);
+        return searcher.termSearchWithSearchResponse(queryExpandedSearchTerms, searchResultSize);
     }
 
     private void calculateKlScores() {

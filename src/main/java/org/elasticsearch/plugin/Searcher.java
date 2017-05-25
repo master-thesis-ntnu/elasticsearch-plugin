@@ -10,32 +10,42 @@ public class Searcher {
     private NodeClient client;
 
     private static final String INDEX_NAME = "photos";
+    private static final int DEFAULT_SEARCH_RESULT_SIZE = 10;
 
     public Searcher(NodeClient client) {
         this.client = client;
     }
 
     public SearchHit[] termSearch(String[] termsQuery) {
+        return termSearch(termsQuery, DEFAULT_SEARCH_RESULT_SIZE);
+    }
+
+    public SearchHit[] termSearch(String[] termsQuery, int searchResultSize) {
         SearchResponse searchResponse = client
                 .prepareSearch(INDEX_NAME)
                 .setQuery(QueryBuilders.termsQuery("tags", termsQuery))
+                .setSize(searchResultSize)
                 .get();
 
         return searchResponse.getHits().getHits();
     }
 
     public SearchResponse termSearchWithSearchResponse(String[] termsQuery) {
+        return termSearchWithSearchResponse(termsQuery, DEFAULT_SEARCH_RESULT_SIZE);
+    }
+
+    public SearchResponse termSearchWithSearchResponse(String[] termsQuery, int searchResultSize) {
         return client
                 .prepareSearch(INDEX_NAME)
                 .setQuery(QueryBuilders.termsQuery("tags", termsQuery))
-                // TODO: maybe use this? .setSize(0)
+                .setSize(searchResultSize)
                 .get();
     }
 
     public long getNumberOfTimesInCollection(String term) {
         SearchResponse searchResponse = client.prepareSearch(INDEX_NAME)
                 .setQuery(QueryBuilders.termQuery("tags", term))
-                // TODO: maybe use this? .setSize(0)
+                .setSize(0)
                 .get();
 
         return searchResponse.getHits().getTotalHits();

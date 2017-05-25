@@ -7,7 +7,6 @@ import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentHelper;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.rest.*;
 
 import java.io.IOException;
@@ -17,6 +16,7 @@ import static org.elasticsearch.rest.RestRequest.Method.POST;
 
 public class QueryExpansionRestHandler extends BaseRestHandler {
     private static final String INDEX_NAME = "photos";
+    private static final int DEFAULT_SEARCH_RESULT_SIZE = 10;
 
     @Inject
     public QueryExpansionRestHandler(Settings settings, RestController controller) {
@@ -26,12 +26,10 @@ public class QueryExpansionRestHandler extends BaseRestHandler {
 
     @Override
     protected RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) throws IOException {
-        SearchResponse searchResponse = client.prepareSearch(INDEX_NAME)
-                .setQuery(QueryBuilders.termsQuery("tags", "test"))
-                .get();
-
         String searchQuery = retrieveSearchStringFromRequest(request.content());
-        QueryExpansion queryExpansion = new QueryExpansion(client);
+        int searchResultSize = getSearchResultSizeFromRequest(request.content());
+
+        QueryExpansion queryExpansion = new QueryExpansion(client, searchResultSize);
         SearchResponse queryExpandedSearchResult = queryExpansion.getQueryExpandedSearch(searchQuery);
 
         // String result = searchQuery;
@@ -44,6 +42,17 @@ public class QueryExpansionRestHandler extends BaseRestHandler {
             builder.endObject();
             channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
         };
+    }
+
+    private int getSearchResultSizeFromRequest(BytesReference postRequestContent) {
+        int searchResultSize = DEFAULT_SEARCH_RESULT_SIZE;
+        Map<String, Object> requestBodyDictionary = XContentHelper.convertToMap(postRequestContent, false).v2();
+
+        if (requestBodyDictionary.containsKey("size")) {
+            searchResultSize = (int) requestBodyDictionary.get("size");
+        }
+
+        return searchResultSize;
     }
 
     private String retrieveSearchStringFromRequest(BytesReference postRequestContent) {
